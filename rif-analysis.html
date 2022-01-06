@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 10 RIF Analysis | Gene expression analysis using the DE4Rumi package</title>
+  <meta name="description" content="<p>Semi-automatic analysis of RNA-seq datasets, incorporating DESeq2, PIF, RIF,
+and PCIT. Designed and tested on ruminant datasets that typically include
+RNA-seq data form multiple tissue regions and test between multiple pairwise
+treatment comparisons.</p>" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 10 RIF Analysis | Gene expression analysis using the DE4Rumi package" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="<p>Semi-automatic analysis of RNA-seq datasets, incorporating DESeq2, PIF, RIF,
+and PCIT. Designed and tested on ruminant datasets that typically include
+RNA-seq data form multiple tissue regions and test between multiple pairwise
+treatment comparisons.</p>" />
+  <meta name="github-repo" content="davos-i/DE4Rumi_Instructions" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 10 RIF Analysis | Gene expression analysis using the DE4Rumi package" />
+  
+  <meta name="twitter:description" content="<p>Semi-automatic analysis of RNA-seq datasets, incorporating DESeq2, PIF, RIF,
+and PCIT. Designed and tested on ruminant datasets that typically include
+RNA-seq data form multiple tissue regions and test between multiple pairwise
+treatment comparisons.</p>" />
+  
+
+<meta name="author" content="David Innes" />
+
+
+<meta name="date" content="2022-01-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="whole-dataset-normalisation.html"/>
+<link rel="next" href="pcit.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Gene expression analysis with DE4Rumi</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#installing-de4rumi-package"><i class="fa fa-check"></i><b>1.1</b> Installing DE4Rumi Package</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="project-set-up.html"><a href="project-set-up.html"><i class="fa fa-check"></i><b>2</b> Project set up</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="project-set-up.html"><a href="project-set-up.html#use-r-notebooks"><i class="fa fa-check"></i><b>2.1</b> Use R Notebooks</a></li>
+<li class="chapter" data-level="2.2" data-path="project-set-up.html"><a href="project-set-up.html#setup-packages"><i class="fa fa-check"></i><b>2.2</b> Setup packages</a></li>
+<li class="chapter" data-level="2.3" data-path="project-set-up.html"><a href="project-set-up.html#a-note-on-file-paths"><i class="fa fa-check"></i><b>2.3</b> A note on file paths</a></li>
+<li class="chapter" data-level="2.4" data-path="project-set-up.html"><a href="project-set-up.html#figures-displayed-below-code-chunks"><i class="fa fa-check"></i><b>2.4</b> Figures displayed below code chunks</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="importing-data.html"><a href="importing-data.html"><i class="fa fa-check"></i><b>3</b> Importing Data</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="importing-data.html"><a href="importing-data.html#note-on-importing-files"><i class="fa fa-check"></i><b>3.1</b> Note on importing files</a></li>
+<li class="chapter" data-level="3.2" data-path="importing-data.html"><a href="importing-data.html#import-count-data"><i class="fa fa-check"></i><b>3.2</b> Import count data</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="importing-data.html"><a href="importing-data.html#check-structure-of-data"><i class="fa fa-check"></i><b>3.2.1</b> Check structure of data</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="importing-data.html"><a href="importing-data.html#import-column-metadata"><i class="fa fa-check"></i><b>3.3</b> Import column metadata</a></li>
+<li class="chapter" data-level="3.4" data-path="importing-data.html"><a href="importing-data.html#rename-columns-to-match-required-format"><i class="fa fa-check"></i><b>3.4</b> Rename columns to match required format</a></li>
+<li class="chapter" data-level="3.5" data-path="importing-data.html"><a href="importing-data.html#check-data"><i class="fa fa-check"></i><b>3.5</b> Check data</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prepare-data.html"><a href="prepare-data.html"><i class="fa fa-check"></i><b>4</b> Prepare Data</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prepare-data.html"><a href="prepare-data.html#get-human-equivalant-gene-names"><i class="fa fa-check"></i><b>4.1</b> Get human equivalant gene names</a></li>
+<li class="chapter" data-level="4.2" data-path="prepare-data.html"><a href="prepare-data.html#prepare-summarized-experiment-object"><i class="fa fa-check"></i><b>4.2</b> Prepare summarized experiment object</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="de-analysis.html"><a href="de-analysis.html"><i class="fa fa-check"></i><b>5</b> DE Analysis</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="de-analysis.html"><a href="de-analysis.html#generate-de-results"><i class="fa fa-check"></i><b>5.1</b> Generate DE results</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="access-results.html"><a href="access-results.html"><i class="fa fa-check"></i><b>6</b> 6. Access results</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="access-results.html"><a href="access-results.html#boxplot-of-cooks-distances"><i class="fa fa-check"></i><b>6.1</b> Boxplot of cooks distances</a></li>
+<li class="chapter" data-level="6.2" data-path="access-results.html"><a href="access-results.html#pca"><i class="fa fa-check"></i><b>6.2</b> PCA</a></li>
+<li class="chapter" data-level="6.3" data-path="access-results.html"><a href="access-results.html#heatmap"><i class="fa fa-check"></i><b>6.3</b> Heatmap</a></li>
+<li class="chapter" data-level="6.4" data-path="access-results.html"><a href="access-results.html#sample-distances"><i class="fa fa-check"></i><b>6.4</b> Sample distances</a></li>
+<li class="chapter" data-level="6.5" data-path="access-results.html"><a href="access-results.html#remove-outliers-if-needed-and-re-run-steps-de-analysis"><i class="fa fa-check"></i><b>6.5</b> Remove outliers if needed and re-run steps DE Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="functional-enrichment-analysis.html"><a href="functional-enrichment-analysis.html"><i class="fa fa-check"></i><b>7</b> Functional enrichment analysis</a></li>
+<li class="chapter" data-level="8" data-path="ma-plots.html"><a href="ma-plots.html"><i class="fa fa-check"></i><b>8</b> MA Plots</a></li>
+<li class="chapter" data-level="9" data-path="whole-dataset-normalisation.html"><a href="whole-dataset-normalisation.html"><i class="fa fa-check"></i><b>9</b> Whole dataset normalisation</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="whole-dataset-normalisation.html"><a href="whole-dataset-normalisation.html#view-cooks-distance-boxplot-for-whole-dataset"><i class="fa fa-check"></i><b>9.1</b> View Cooks distance boxplot for whole dataset</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="rif-analysis.html"><a href="rif-analysis.html"><i class="fa fa-check"></i><b>10</b> RIF Analysis</a></li>
+<li class="chapter" data-level="11" data-path="pcit.html"><a href="pcit.html"><i class="fa fa-check"></i><b>11</b> PCIT</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="pcit.html"><a href="pcit.html#prepare-data-for-pcit-analysis"><i class="fa fa-check"></i><b>11.1</b> Prepare data for PCIT analysis</a></li>
+<li class="chapter" data-level="11.2" data-path="pcit.html"><a href="pcit.html#run-pcit-analysis"><i class="fa fa-check"></i><b>11.2</b> Run PCIT Analysis</a></li>
+<li class="chapter" data-level="11.3" data-path="pcit.html"><a href="pcit.html#filter-pcit-output-for-cytoscape"><i class="fa fa-check"></i><b>11.3</b> Filter PCIT output for Cytoscape</a></li>
+<li class="chapter" data-level="11.4" data-path="pcit.html"><a href="pcit.html#viewing-in-cytoscape"><i class="fa fa-check"></i><b>11.4</b> Viewing in Cytoscape</a>
+<ul>
+<li class="chapter" data-level="11.4.1" data-path="pcit.html"><a href="pcit.html#import-pcit-output-to-cytoscape"><i class="fa fa-check"></i><b>11.4.1</b> Import PCIT output to cytoscape</a></li>
+<li class="chapter" data-level="11.4.2" data-path="pcit.html"><a href="pcit.html#import-metadata-for-genes"><i class="fa fa-check"></i><b>11.4.2</b> Import metadata for genes</a></li>
+<li class="chapter" data-level="11.4.3" data-path="pcit.html"><a href="pcit.html#further-details"><i class="fa fa-check"></i><b>11.4.3</b> Further Details</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="plot-genes-of-interest.html"><a href="plot-genes-of-interest.html"><i class="fa fa-check"></i><b>12</b> Plot genes of interest</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Gene expression analysis using the DE4Rumi package</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="rif-analysis" class="section level1" number="10">
+<h1><span class="header-section-number">Chapter 10</span> RIF Analysis</h1>
+<p>One of the additional steps in the pipeline is to calculate Regulatory Impact Factor (RIF) scores for either transcription factors (TF) or any gene of interest.</p>
+<p>Genes that are not DE may still have a regulatory role that can be inferred from these abstract calculations. See <a href="https://doi.org/10.1093/bioinformatics/btq051" class="uri">https://doi.org/10.1093/bioinformatics/btq051</a></p>
+<p>By setting the <code>TFs = NA</code> and <code>all_genes_as_TF = TRUE</code> we are telling the function to use all genes as possible TF. Otherwise, we could set <code>all_genes_as_TF = FALSE</code> and then manually provide a list of TFs. For example, one might download the list of TF off the animalTFDB (<a href="http://bioinfo.life.hust.edu.cn/AnimalTFDB/" class="uri">http://bioinfo.life.hust.edu.cn/AnimalTFDB/</a>) to focus on.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="rif-analysis.html#cb51-1" aria-hidden="true" tabindex="-1"></a>DE_dataframes_list <span class="ot">&lt;-</span> </span>
+<span id="cb51-2"><a href="rif-analysis.html#cb51-2" aria-hidden="true" tabindex="-1"></a>  DE_out <span class="sc">%&gt;%</span> </span>
+<span id="cb51-3"><a href="rif-analysis.html#cb51-3" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map</span>(<span class="st">&quot;DE_sig_PIF_df&quot;</span>)</span>
+<span id="cb51-4"><a href="rif-analysis.html#cb51-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-5"><a href="rif-analysis.html#cb51-5" aria-hidden="true" tabindex="-1"></a>vst_norm_data <span class="ot">&lt;-</span> <span class="fu">GET_normalised_data</span>(full_norm, <span class="at">vst_or_log2 =</span> <span class="st">&quot;VST&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb51-6"><a href="rif-analysis.html#cb51-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-7"><a href="rif-analysis.html#cb51-7" aria-hidden="true" tabindex="-1"></a>RIF_output <span class="ot">&lt;-</span> </span>
+<span id="cb51-8"><a href="rif-analysis.html#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate_RIF</span>(<span class="at">DE_output =</span> DE_out,</span>
+<span id="cb51-9"><a href="rif-analysis.html#cb51-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">TFs =</span> <span class="cn">NA</span>,</span>
+<span id="cb51-10"><a href="rif-analysis.html#cb51-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">norm_exp_data =</span> vst_norm_data,</span>
+<span id="cb51-11"><a href="rif-analysis.html#cb51-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">gene_annotations =</span> gene_annot,</span>
+<span id="cb51-12"><a href="rif-analysis.html#cb51-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">all_genes_as_TF =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb51-13"><a href="rif-analysis.html#cb51-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">colData =</span> SummarizedExperiment<span class="sc">::</span><span class="fu">colData</span>(seq_data) ,</span>
+<span id="cb51-14"><a href="rif-analysis.html#cb51-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">results_contrast_factor =</span> Treatment,</span>
+<span id="cb51-15"><a href="rif-analysis.html#cb51-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">samples_colname =</span> sample_names)</span>
+<span id="cb51-16"><a href="rif-analysis.html#cb51-16" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-17"><a href="rif-analysis.html#cb51-17" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-18"><a href="rif-analysis.html#cb51-18" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* Start of -  ARC *******************</span></span>
+<span id="cb51-19"><a href="rif-analysis.html#cb51-19" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-20"><a href="rif-analysis.html#cb51-20" aria-hidden="true" tabindex="-1"></a><span class="do">##  ARC - LR vs MAL </span></span>
+<span id="cb51-21"><a href="rif-analysis.html#cb51-21" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  8 </span></span>
+<span id="cb51-22"><a href="rif-analysis.html#cb51-22" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-23"><a href="rif-analysis.html#cb51-23" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  ARC_004__LR, ARC_022__LR, ARC_032__LR, ARC_079__LR, ARC_149__LR </span></span>
+<span id="cb51-24"><a href="rif-analysis.html#cb51-24" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  ARC_008__MAL, ARC_066__MAL, ARC_088__MAL, ARC_096__MAL, ARC_186__MAL</span></span>
+<span id="cb51-25"><a href="rif-analysis.html#cb51-25" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  1658</span></span>
+<span id="cb51-26"><a href="rif-analysis.html#cb51-26" aria-hidden="true" tabindex="-1"></a><span class="do">## Registered S3 method overwritten by &#39;GGally&#39;:</span></span>
+<span id="cb51-27"><a href="rif-analysis.html#cb51-27" aria-hidden="true" tabindex="-1"></a><span class="do">##   method from   </span></span>
+<span id="cb51-28"><a href="rif-analysis.html#cb51-28" aria-hidden="true" tabindex="-1"></a><span class="do">##   +.gg   ggplot2</span></span>
+<span id="cb51-29"><a href="rif-analysis.html#cb51-29" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-30"><a href="rif-analysis.html#cb51-30" aria-hidden="true" tabindex="-1"></a><span class="do">## Registered S3 method overwritten by &#39;ggnetwork&#39;:</span></span>
+<span id="cb51-31"><a href="rif-analysis.html#cb51-31" aria-hidden="true" tabindex="-1"></a><span class="do">##   method         from  </span></span>
+<span id="cb51-32"><a href="rif-analysis.html#cb51-32" aria-hidden="true" tabindex="-1"></a><span class="do">##   fortify.igraph ggtree</span></span>
+<span id="cb51-33"><a href="rif-analysis.html#cb51-33" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-34"><a href="rif-analysis.html#cb51-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-35"><a href="rif-analysis.html#cb51-35" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-36"><a href="rif-analysis.html#cb51-36" aria-hidden="true" tabindex="-1"></a><span class="do">##  ARC - LR vs LAL </span></span>
+<span id="cb51-37"><a href="rif-analysis.html#cb51-37" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  124 </span></span>
+<span id="cb51-38"><a href="rif-analysis.html#cb51-38" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-39"><a href="rif-analysis.html#cb51-39" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  ARC_004__LR, ARC_022__LR, ARC_032__LR, ARC_079__LR, ARC_149__LR </span></span>
+<span id="cb51-40"><a href="rif-analysis.html#cb51-40" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  ARC_052__LAL, ARC_112__LAL, ARC_136__LAL, ARC_184__LAL, ARC_193__LAL</span></span>
+<span id="cb51-41"><a href="rif-analysis.html#cb51-41" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  1625</span></span>
+<span id="cb51-42"><a href="rif-analysis.html#cb51-42" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-43"><a href="rif-analysis.html#cb51-43" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-44"><a href="rif-analysis.html#cb51-44" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-45"><a href="rif-analysis.html#cb51-45" aria-hidden="true" tabindex="-1"></a><span class="do">##  ARC - MAL vs LAL </span></span>
+<span id="cb51-46"><a href="rif-analysis.html#cb51-46" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  179 </span></span>
+<span id="cb51-47"><a href="rif-analysis.html#cb51-47" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-48"><a href="rif-analysis.html#cb51-48" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  ARC_008__MAL, ARC_066__MAL, ARC_088__MAL, ARC_096__MAL, ARC_186__MAL </span></span>
+<span id="cb51-49"><a href="rif-analysis.html#cb51-49" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  ARC_052__LAL, ARC_112__LAL, ARC_136__LAL, ARC_184__LAL, ARC_193__LAL</span></span>
+<span id="cb51-50"><a href="rif-analysis.html#cb51-50" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  1642</span></span>
+<span id="cb51-51"><a href="rif-analysis.html#cb51-51" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-52"><a href="rif-analysis.html#cb51-52" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-53"><a href="rif-analysis.html#cb51-53" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-54"><a href="rif-analysis.html#cb51-54" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-55"><a href="rif-analysis.html#cb51-55" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* End of -  ARC *******************</span></span>
+<span id="cb51-56"><a href="rif-analysis.html#cb51-56" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-57"><a href="rif-analysis.html#cb51-57" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-58"><a href="rif-analysis.html#cb51-58" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* Start of -  LHA *******************</span></span>
+<span id="cb51-59"><a href="rif-analysis.html#cb51-59" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-60"><a href="rif-analysis.html#cb51-60" aria-hidden="true" tabindex="-1"></a><span class="do">##  LHA - LR vs MAL </span></span>
+<span id="cb51-61"><a href="rif-analysis.html#cb51-61" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  4 </span></span>
+<span id="cb51-62"><a href="rif-analysis.html#cb51-62" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-63"><a href="rif-analysis.html#cb51-63" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  LHA_004__LR, LHA_022__LR, LHA_032__LR, LHA_079__LR, LHA_149__LR </span></span>
+<span id="cb51-64"><a href="rif-analysis.html#cb51-64" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  LHA_008__MAL, LHA_066__MAL, LHA_088__MAL, LHA_096__MAL, LHA_186__MAL</span></span>
+<span id="cb51-65"><a href="rif-analysis.html#cb51-65" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  2600</span></span>
+<span id="cb51-66"><a href="rif-analysis.html#cb51-66" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-67"><a href="rif-analysis.html#cb51-67" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-68"><a href="rif-analysis.html#cb51-68" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-69"><a href="rif-analysis.html#cb51-69" aria-hidden="true" tabindex="-1"></a><span class="do">##  LHA - LR vs LAL </span></span>
+<span id="cb51-70"><a href="rif-analysis.html#cb51-70" aria-hidden="true" tabindex="-1"></a><span class="do">##  Did not run RIF -- Number of target genes:  0</span></span>
+<span id="cb51-71"><a href="rif-analysis.html#cb51-71" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-72"><a href="rif-analysis.html#cb51-72" aria-hidden="true" tabindex="-1"></a><span class="do">##  LHA - MAL vs LAL </span></span>
+<span id="cb51-73"><a href="rif-analysis.html#cb51-73" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  2 </span></span>
+<span id="cb51-74"><a href="rif-analysis.html#cb51-74" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-75"><a href="rif-analysis.html#cb51-75" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  LHA_008__MAL, LHA_066__MAL, LHA_088__MAL, LHA_096__MAL, LHA_186__MAL </span></span>
+<span id="cb51-76"><a href="rif-analysis.html#cb51-76" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  LHA_052__LAL, LHA_112__LAL, LHA_136__LAL, LHA_184__LAL, LHA_193__LAL</span></span>
+<span id="cb51-77"><a href="rif-analysis.html#cb51-77" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  2623</span></span>
+<span id="cb51-78"><a href="rif-analysis.html#cb51-78" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-79"><a href="rif-analysis.html#cb51-79" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-80"><a href="rif-analysis.html#cb51-80" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-81"><a href="rif-analysis.html#cb51-81" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-82"><a href="rif-analysis.html#cb51-82" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* End of -  LHA *******************</span></span>
+<span id="cb51-83"><a href="rif-analysis.html#cb51-83" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-84"><a href="rif-analysis.html#cb51-84" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-85"><a href="rif-analysis.html#cb51-85" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* Start of -  VMH *******************</span></span>
+<span id="cb51-86"><a href="rif-analysis.html#cb51-86" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-87"><a href="rif-analysis.html#cb51-87" aria-hidden="true" tabindex="-1"></a><span class="do">##  VMH - LR vs MAL </span></span>
+<span id="cb51-88"><a href="rif-analysis.html#cb51-88" aria-hidden="true" tabindex="-1"></a><span class="do">##  Did not run RIF -- Number of target genes:  1</span></span>
+<span id="cb51-89"><a href="rif-analysis.html#cb51-89" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-90"><a href="rif-analysis.html#cb51-90" aria-hidden="true" tabindex="-1"></a><span class="do">##  VMH - LR vs LAL </span></span>
+<span id="cb51-91"><a href="rif-analysis.html#cb51-91" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  11 </span></span>
+<span id="cb51-92"><a href="rif-analysis.html#cb51-92" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-93"><a href="rif-analysis.html#cb51-93" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  VMH_004__LR, VMH_022__LR, VMH_032__LR, VMH_079__LR, VMH_149__LR </span></span>
+<span id="cb51-94"><a href="rif-analysis.html#cb51-94" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  VMH_052__LAL, VMH_112__LAL, VMH_136__LAL, VMH_184__LAL, VMH_193__LAL</span></span>
+<span id="cb51-95"><a href="rif-analysis.html#cb51-95" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  2156</span></span>
+<span id="cb51-96"><a href="rif-analysis.html#cb51-96" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-97"><a href="rif-analysis.html#cb51-97" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-98"><a href="rif-analysis.html#cb51-98" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-99"><a href="rif-analysis.html#cb51-99" aria-hidden="true" tabindex="-1"></a><span class="do">##  VMH - MAL vs LAL </span></span>
+<span id="cb51-100"><a href="rif-analysis.html#cb51-100" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  5 </span></span>
+<span id="cb51-101"><a href="rif-analysis.html#cb51-101" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-102"><a href="rif-analysis.html#cb51-102" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  VMH_008__MAL, VMH_066__MAL, VMH_088__MAL, VMH_096__MAL, VMH_186__MAL </span></span>
+<span id="cb51-103"><a href="rif-analysis.html#cb51-103" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  VMH_052__LAL, VMH_112__LAL, VMH_136__LAL, VMH_184__LAL, VMH_193__LAL</span></span>
+<span id="cb51-104"><a href="rif-analysis.html#cb51-104" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  2188</span></span>
+<span id="cb51-105"><a href="rif-analysis.html#cb51-105" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-106"><a href="rif-analysis.html#cb51-106" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-107"><a href="rif-analysis.html#cb51-107" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-108"><a href="rif-analysis.html#cb51-108" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-109"><a href="rif-analysis.html#cb51-109" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* End of -  VMH *******************</span></span>
+<span id="cb51-110"><a href="rif-analysis.html#cb51-110" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-111"><a href="rif-analysis.html#cb51-111" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-112"><a href="rif-analysis.html#cb51-112" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* Start of -  ABO *******************</span></span>
+<span id="cb51-113"><a href="rif-analysis.html#cb51-113" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-114"><a href="rif-analysis.html#cb51-114" aria-hidden="true" tabindex="-1"></a><span class="do">##  ABO - LR vs MAL </span></span>
+<span id="cb51-115"><a href="rif-analysis.html#cb51-115" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  2 </span></span>
+<span id="cb51-116"><a href="rif-analysis.html#cb51-116" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-117"><a href="rif-analysis.html#cb51-117" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  ABO_004__LR, ABO_022__LR, ABO_032__LR, ABO_079__LR, ABO_149__LR </span></span>
+<span id="cb51-118"><a href="rif-analysis.html#cb51-118" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  ABO_008__MAL, ABO_066__MAL, ABO_088__MAL, ABO_096__MAL, ABO_186__MAL</span></span>
+<span id="cb51-119"><a href="rif-analysis.html#cb51-119" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3352</span></span>
+<span id="cb51-120"><a href="rif-analysis.html#cb51-120" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-121"><a href="rif-analysis.html#cb51-121" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-122"><a href="rif-analysis.html#cb51-122" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-123"><a href="rif-analysis.html#cb51-123" aria-hidden="true" tabindex="-1"></a><span class="do">##  ABO - LR vs LAL </span></span>
+<span id="cb51-124"><a href="rif-analysis.html#cb51-124" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  19 </span></span>
+<span id="cb51-125"><a href="rif-analysis.html#cb51-125" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-126"><a href="rif-analysis.html#cb51-126" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  ABO_004__LR, ABO_022__LR, ABO_032__LR, ABO_079__LR, ABO_149__LR </span></span>
+<span id="cb51-127"><a href="rif-analysis.html#cb51-127" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  ABO_052__LAL, ABO_112__LAL, ABO_136__LAL, ABO_184__LAL, ABO_193__LAL</span></span>
+<span id="cb51-128"><a href="rif-analysis.html#cb51-128" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3206</span></span>
+<span id="cb51-129"><a href="rif-analysis.html#cb51-129" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-130"><a href="rif-analysis.html#cb51-130" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-131"><a href="rif-analysis.html#cb51-131" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-132"><a href="rif-analysis.html#cb51-132" aria-hidden="true" tabindex="-1"></a><span class="do">##  ABO - MAL vs LAL </span></span>
+<span id="cb51-133"><a href="rif-analysis.html#cb51-133" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  21 </span></span>
+<span id="cb51-134"><a href="rif-analysis.html#cb51-134" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-135"><a href="rif-analysis.html#cb51-135" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  ABO_008__MAL, ABO_066__MAL, ABO_088__MAL, ABO_096__MAL, ABO_186__MAL </span></span>
+<span id="cb51-136"><a href="rif-analysis.html#cb51-136" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  ABO_052__LAL, ABO_112__LAL, ABO_136__LAL, ABO_184__LAL, ABO_193__LAL</span></span>
+<span id="cb51-137"><a href="rif-analysis.html#cb51-137" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3375</span></span>
+<span id="cb51-138"><a href="rif-analysis.html#cb51-138" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-139"><a href="rif-analysis.html#cb51-139" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-140"><a href="rif-analysis.html#cb51-140" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-141"><a href="rif-analysis.html#cb51-141" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-142"><a href="rif-analysis.html#cb51-142" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* End of -  ABO *******************</span></span>
+<span id="cb51-143"><a href="rif-analysis.html#cb51-143" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-144"><a href="rif-analysis.html#cb51-144" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-145"><a href="rif-analysis.html#cb51-145" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* Start of -  DUO *******************</span></span>
+<span id="cb51-146"><a href="rif-analysis.html#cb51-146" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-147"><a href="rif-analysis.html#cb51-147" aria-hidden="true" tabindex="-1"></a><span class="do">##  DUO - LR vs MAL </span></span>
+<span id="cb51-148"><a href="rif-analysis.html#cb51-148" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  789 </span></span>
+<span id="cb51-149"><a href="rif-analysis.html#cb51-149" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-150"><a href="rif-analysis.html#cb51-150" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  DUO_004__LR, DUO_022__LR, DUO_032__LR, DUO_079__LR, DUO_149__LR </span></span>
+<span id="cb51-151"><a href="rif-analysis.html#cb51-151" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  DUO_008__MAL, DUO_066__MAL, DUO_088__MAL, DUO_096__MAL, DUO_186__MAL</span></span>
+<span id="cb51-152"><a href="rif-analysis.html#cb51-152" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  2520</span></span>
+<span id="cb51-153"><a href="rif-analysis.html#cb51-153" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-154"><a href="rif-analysis.html#cb51-154" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-155"><a href="rif-analysis.html#cb51-155" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-156"><a href="rif-analysis.html#cb51-156" aria-hidden="true" tabindex="-1"></a><span class="do">##  DUO - LR vs LAL </span></span>
+<span id="cb51-157"><a href="rif-analysis.html#cb51-157" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  75 </span></span>
+<span id="cb51-158"><a href="rif-analysis.html#cb51-158" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-159"><a href="rif-analysis.html#cb51-159" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  DUO_004__LR, DUO_022__LR, DUO_032__LR, DUO_079__LR, DUO_149__LR </span></span>
+<span id="cb51-160"><a href="rif-analysis.html#cb51-160" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  DUO_052__LAL, DUO_112__LAL, DUO_136__LAL, DUO_184__LAL, DUO_193__LAL</span></span>
+<span id="cb51-161"><a href="rif-analysis.html#cb51-161" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  2577</span></span>
+<span id="cb51-162"><a href="rif-analysis.html#cb51-162" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-163"><a href="rif-analysis.html#cb51-163" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-164"><a href="rif-analysis.html#cb51-164" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-165"><a href="rif-analysis.html#cb51-165" aria-hidden="true" tabindex="-1"></a><span class="do">##  DUO - MAL vs LAL </span></span>
+<span id="cb51-166"><a href="rif-analysis.html#cb51-166" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  210 </span></span>
+<span id="cb51-167"><a href="rif-analysis.html#cb51-167" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-168"><a href="rif-analysis.html#cb51-168" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  DUO_008__MAL, DUO_066__MAL, DUO_088__MAL, DUO_096__MAL, DUO_186__MAL </span></span>
+<span id="cb51-169"><a href="rif-analysis.html#cb51-169" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  DUO_052__LAL, DUO_112__LAL, DUO_136__LAL, DUO_184__LAL, DUO_193__LAL</span></span>
+<span id="cb51-170"><a href="rif-analysis.html#cb51-170" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  2571</span></span>
+<span id="cb51-171"><a href="rif-analysis.html#cb51-171" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-172"><a href="rif-analysis.html#cb51-172" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-173"><a href="rif-analysis.html#cb51-173" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-174"><a href="rif-analysis.html#cb51-174" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-175"><a href="rif-analysis.html#cb51-175" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* End of -  DUO *******************</span></span>
+<span id="cb51-176"><a href="rif-analysis.html#cb51-176" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-177"><a href="rif-analysis.html#cb51-177" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-178"><a href="rif-analysis.html#cb51-178" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* Start of -  RUM *******************</span></span>
+<span id="cb51-179"><a href="rif-analysis.html#cb51-179" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-180"><a href="rif-analysis.html#cb51-180" aria-hidden="true" tabindex="-1"></a><span class="do">##  RUM - LR vs MAL </span></span>
+<span id="cb51-181"><a href="rif-analysis.html#cb51-181" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  487 </span></span>
+<span id="cb51-182"><a href="rif-analysis.html#cb51-182" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-183"><a href="rif-analysis.html#cb51-183" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  RUM_004__LR, RUM_022__LR, RUM_032__LR, RUM_079__LR, RUM_149__LR </span></span>
+<span id="cb51-184"><a href="rif-analysis.html#cb51-184" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  RUM_008__MAL, RUM_066__MAL, RUM_088__MAL, RUM_096__MAL, RUM_186__MAL</span></span>
+<span id="cb51-185"><a href="rif-analysis.html#cb51-185" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3912</span></span>
+<span id="cb51-186"><a href="rif-analysis.html#cb51-186" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-187"><a href="rif-analysis.html#cb51-187" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-188"><a href="rif-analysis.html#cb51-188" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-189"><a href="rif-analysis.html#cb51-189" aria-hidden="true" tabindex="-1"></a><span class="do">##  RUM - LR vs LAL </span></span>
+<span id="cb51-190"><a href="rif-analysis.html#cb51-190" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  43 </span></span>
+<span id="cb51-191"><a href="rif-analysis.html#cb51-191" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-192"><a href="rif-analysis.html#cb51-192" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  RUM_004__LR, RUM_022__LR, RUM_032__LR, RUM_079__LR, RUM_149__LR </span></span>
+<span id="cb51-193"><a href="rif-analysis.html#cb51-193" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  RUM_052__LAL, RUM_112__LAL, RUM_136__LAL, RUM_184__LAL, RUM_193__LAL</span></span>
+<span id="cb51-194"><a href="rif-analysis.html#cb51-194" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3799</span></span>
+<span id="cb51-195"><a href="rif-analysis.html#cb51-195" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-196"><a href="rif-analysis.html#cb51-196" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-197"><a href="rif-analysis.html#cb51-197" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-198"><a href="rif-analysis.html#cb51-198" aria-hidden="true" tabindex="-1"></a><span class="do">##  RUM - MAL vs LAL </span></span>
+<span id="cb51-199"><a href="rif-analysis.html#cb51-199" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  360 </span></span>
+<span id="cb51-200"><a href="rif-analysis.html#cb51-200" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-201"><a href="rif-analysis.html#cb51-201" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  RUM_008__MAL, RUM_066__MAL, RUM_088__MAL, RUM_096__MAL, RUM_186__MAL </span></span>
+<span id="cb51-202"><a href="rif-analysis.html#cb51-202" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  RUM_052__LAL, RUM_112__LAL, RUM_136__LAL, RUM_184__LAL, RUM_193__LAL</span></span>
+<span id="cb51-203"><a href="rif-analysis.html#cb51-203" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3901</span></span>
+<span id="cb51-204"><a href="rif-analysis.html#cb51-204" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-205"><a href="rif-analysis.html#cb51-205" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-206"><a href="rif-analysis.html#cb51-206" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-207"><a href="rif-analysis.html#cb51-207" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-208"><a href="rif-analysis.html#cb51-208" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* End of -  RUM *******************</span></span>
+<span id="cb51-209"><a href="rif-analysis.html#cb51-209" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-210"><a href="rif-analysis.html#cb51-210" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-211"><a href="rif-analysis.html#cb51-211" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* Start of -  LIV *******************</span></span>
+<span id="cb51-212"><a href="rif-analysis.html#cb51-212" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-213"><a href="rif-analysis.html#cb51-213" aria-hidden="true" tabindex="-1"></a><span class="do">##  LIV - LR vs MAL </span></span>
+<span id="cb51-214"><a href="rif-analysis.html#cb51-214" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  62 </span></span>
+<span id="cb51-215"><a href="rif-analysis.html#cb51-215" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-216"><a href="rif-analysis.html#cb51-216" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  LIV_004__LR, LIV_022__LR, LIV_032__LR, LIV_079__LR, LIV_149__LR </span></span>
+<span id="cb51-217"><a href="rif-analysis.html#cb51-217" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  LIV_008__MAL, LIV_066__MAL, LIV_088__MAL, LIV_096__MAL, LIV_186__MAL</span></span>
+<span id="cb51-218"><a href="rif-analysis.html#cb51-218" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3399</span></span>
+<span id="cb51-219"><a href="rif-analysis.html#cb51-219" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-220"><a href="rif-analysis.html#cb51-220" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-221"><a href="rif-analysis.html#cb51-221" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-222"><a href="rif-analysis.html#cb51-222" aria-hidden="true" tabindex="-1"></a><span class="do">##  LIV - LR vs LAL </span></span>
+<span id="cb51-223"><a href="rif-analysis.html#cb51-223" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  288 </span></span>
+<span id="cb51-224"><a href="rif-analysis.html#cb51-224" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-225"><a href="rif-analysis.html#cb51-225" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  LIV_004__LR, LIV_022__LR, LIV_032__LR, LIV_079__LR, LIV_149__LR </span></span>
+<span id="cb51-226"><a href="rif-analysis.html#cb51-226" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  LIV_052__LAL, LIV_112__LAL, LIV_136__LAL, LIV_184__LAL, LIV_193__LAL</span></span>
+<span id="cb51-227"><a href="rif-analysis.html#cb51-227" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3585</span></span>
+<span id="cb51-228"><a href="rif-analysis.html#cb51-228" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-229"><a href="rif-analysis.html#cb51-229" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-230"><a href="rif-analysis.html#cb51-230" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-231"><a href="rif-analysis.html#cb51-231" aria-hidden="true" tabindex="-1"></a><span class="do">##  LIV - MAL vs LAL </span></span>
+<span id="cb51-232"><a href="rif-analysis.html#cb51-232" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of target genes:  716 </span></span>
+<span id="cb51-233"><a href="rif-analysis.html#cb51-233" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of TFs (or genes as TFS):  22258</span></span>
+<span id="cb51-234"><a href="rif-analysis.html#cb51-234" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 1:  LIV_008__MAL, LIV_066__MAL, LIV_088__MAL, LIV_096__MAL, LIV_186__MAL </span></span>
+<span id="cb51-235"><a href="rif-analysis.html#cb51-235" aria-hidden="true" tabindex="-1"></a><span class="do">##  names of condition 2:  LIV_052__LAL, LIV_112__LAL, LIV_136__LAL, LIV_184__LAL, LIV_193__LAL</span></span>
+<span id="cb51-236"><a href="rif-analysis.html#cb51-236" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of excluded genes (within condition SD == 0):  3541</span></span>
+<span id="cb51-237"><a href="rif-analysis.html#cb51-237" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF...</span></span>
+<span id="cb51-238"><a href="rif-analysis.html#cb51-238" aria-hidden="true" tabindex="-1"></a><span class="do">## Running RIF... COMPLETE</span></span>
+<span id="cb51-239"><a href="rif-analysis.html#cb51-239" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-240"><a href="rif-analysis.html#cb51-240" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-241"><a href="rif-analysis.html#cb51-241" aria-hidden="true" tabindex="-1"></a><span class="do">##  ******************* End of -  LIV *******************</span></span></code></pre></div>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="whole-dataset-normalisation.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="pcit.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/09-RIF.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

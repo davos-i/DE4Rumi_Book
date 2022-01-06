@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Importing Data | Gene expression analysis using the DE4Rumi package</title>
+  <meta name="description" content="<p>Semi-automatic analysis of RNA-seq datasets, incorporating DESeq2, PIF, RIF,
+and PCIT. Designed and tested on ruminant datasets that typically include
+RNA-seq data form multiple tissue regions and test between multiple pairwise
+treatment comparisons.</p>" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Importing Data | Gene expression analysis using the DE4Rumi package" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="<p>Semi-automatic analysis of RNA-seq datasets, incorporating DESeq2, PIF, RIF,
+and PCIT. Designed and tested on ruminant datasets that typically include
+RNA-seq data form multiple tissue regions and test between multiple pairwise
+treatment comparisons.</p>" />
+  <meta name="github-repo" content="davos-i/DE4Rumi_Instructions" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Importing Data | Gene expression analysis using the DE4Rumi package" />
+  
+  <meta name="twitter:description" content="<p>Semi-automatic analysis of RNA-seq datasets, incorporating DESeq2, PIF, RIF,
+and PCIT. Designed and tested on ruminant datasets that typically include
+RNA-seq data form multiple tissue regions and test between multiple pairwise
+treatment comparisons.</p>" />
+  
+
+<meta name="author" content="David Innes" />
+
+
+<meta name="date" content="2022-01-06" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="project-set-up.html"/>
+<link rel="next" href="prepare-data.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Gene expression analysis with DE4Rumi</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#installing-de4rumi-package"><i class="fa fa-check"></i><b>1.1</b> Installing DE4Rumi Package</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="project-set-up.html"><a href="project-set-up.html"><i class="fa fa-check"></i><b>2</b> Project set up</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="project-set-up.html"><a href="project-set-up.html#use-r-notebooks"><i class="fa fa-check"></i><b>2.1</b> Use R Notebooks</a></li>
+<li class="chapter" data-level="2.2" data-path="project-set-up.html"><a href="project-set-up.html#setup-packages"><i class="fa fa-check"></i><b>2.2</b> Setup packages</a></li>
+<li class="chapter" data-level="2.3" data-path="project-set-up.html"><a href="project-set-up.html#a-note-on-file-paths"><i class="fa fa-check"></i><b>2.3</b> A note on file paths</a></li>
+<li class="chapter" data-level="2.4" data-path="project-set-up.html"><a href="project-set-up.html#figures-displayed-below-code-chunks"><i class="fa fa-check"></i><b>2.4</b> Figures displayed below code chunks</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="importing-data.html"><a href="importing-data.html"><i class="fa fa-check"></i><b>3</b> Importing Data</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="importing-data.html"><a href="importing-data.html#note-on-importing-files"><i class="fa fa-check"></i><b>3.1</b> Note on importing files</a></li>
+<li class="chapter" data-level="3.2" data-path="importing-data.html"><a href="importing-data.html#import-count-data"><i class="fa fa-check"></i><b>3.2</b> Import count data</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="importing-data.html"><a href="importing-data.html#check-structure-of-data"><i class="fa fa-check"></i><b>3.2.1</b> Check structure of data</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="importing-data.html"><a href="importing-data.html#import-column-metadata"><i class="fa fa-check"></i><b>3.3</b> Import column metadata</a></li>
+<li class="chapter" data-level="3.4" data-path="importing-data.html"><a href="importing-data.html#rename-columns-to-match-required-format"><i class="fa fa-check"></i><b>3.4</b> Rename columns to match required format</a></li>
+<li class="chapter" data-level="3.5" data-path="importing-data.html"><a href="importing-data.html#check-data"><i class="fa fa-check"></i><b>3.5</b> Check data</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="prepare-data.html"><a href="prepare-data.html"><i class="fa fa-check"></i><b>4</b> Prepare Data</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="prepare-data.html"><a href="prepare-data.html#get-human-equivalant-gene-names"><i class="fa fa-check"></i><b>4.1</b> Get human equivalant gene names</a></li>
+<li class="chapter" data-level="4.2" data-path="prepare-data.html"><a href="prepare-data.html#prepare-summarized-experiment-object"><i class="fa fa-check"></i><b>4.2</b> Prepare summarized experiment object</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="de-analysis.html"><a href="de-analysis.html"><i class="fa fa-check"></i><b>5</b> DE Analysis</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="de-analysis.html"><a href="de-analysis.html#generate-de-results"><i class="fa fa-check"></i><b>5.1</b> Generate DE results</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="access-results.html"><a href="access-results.html"><i class="fa fa-check"></i><b>6</b> 6. Access results</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="access-results.html"><a href="access-results.html#boxplot-of-cooks-distances"><i class="fa fa-check"></i><b>6.1</b> Boxplot of cooks distances</a></li>
+<li class="chapter" data-level="6.2" data-path="access-results.html"><a href="access-results.html#pca"><i class="fa fa-check"></i><b>6.2</b> PCA</a></li>
+<li class="chapter" data-level="6.3" data-path="access-results.html"><a href="access-results.html#heatmap"><i class="fa fa-check"></i><b>6.3</b> Heatmap</a></li>
+<li class="chapter" data-level="6.4" data-path="access-results.html"><a href="access-results.html#sample-distances"><i class="fa fa-check"></i><b>6.4</b> Sample distances</a></li>
+<li class="chapter" data-level="6.5" data-path="access-results.html"><a href="access-results.html#remove-outliers-if-needed-and-re-run-steps-de-analysis"><i class="fa fa-check"></i><b>6.5</b> Remove outliers if needed and re-run steps DE Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="functional-enrichment-analysis.html"><a href="functional-enrichment-analysis.html"><i class="fa fa-check"></i><b>7</b> Functional enrichment analysis</a></li>
+<li class="chapter" data-level="8" data-path="ma-plots.html"><a href="ma-plots.html"><i class="fa fa-check"></i><b>8</b> MA Plots</a></li>
+<li class="chapter" data-level="9" data-path="whole-dataset-normalisation.html"><a href="whole-dataset-normalisation.html"><i class="fa fa-check"></i><b>9</b> Whole dataset normalisation</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="whole-dataset-normalisation.html"><a href="whole-dataset-normalisation.html#view-cooks-distance-boxplot-for-whole-dataset"><i class="fa fa-check"></i><b>9.1</b> View Cooks distance boxplot for whole dataset</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="rif-analysis.html"><a href="rif-analysis.html"><i class="fa fa-check"></i><b>10</b> RIF Analysis</a></li>
+<li class="chapter" data-level="11" data-path="pcit.html"><a href="pcit.html"><i class="fa fa-check"></i><b>11</b> PCIT</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="pcit.html"><a href="pcit.html#prepare-data-for-pcit-analysis"><i class="fa fa-check"></i><b>11.1</b> Prepare data for PCIT analysis</a></li>
+<li class="chapter" data-level="11.2" data-path="pcit.html"><a href="pcit.html#run-pcit-analysis"><i class="fa fa-check"></i><b>11.2</b> Run PCIT Analysis</a></li>
+<li class="chapter" data-level="11.3" data-path="pcit.html"><a href="pcit.html#filter-pcit-output-for-cytoscape"><i class="fa fa-check"></i><b>11.3</b> Filter PCIT output for Cytoscape</a></li>
+<li class="chapter" data-level="11.4" data-path="pcit.html"><a href="pcit.html#viewing-in-cytoscape"><i class="fa fa-check"></i><b>11.4</b> Viewing in Cytoscape</a>
+<ul>
+<li class="chapter" data-level="11.4.1" data-path="pcit.html"><a href="pcit.html#import-pcit-output-to-cytoscape"><i class="fa fa-check"></i><b>11.4.1</b> Import PCIT output to cytoscape</a></li>
+<li class="chapter" data-level="11.4.2" data-path="pcit.html"><a href="pcit.html#import-metadata-for-genes"><i class="fa fa-check"></i><b>11.4.2</b> Import metadata for genes</a></li>
+<li class="chapter" data-level="11.4.3" data-path="pcit.html"><a href="pcit.html#further-details"><i class="fa fa-check"></i><b>11.4.3</b> Further Details</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="plot-genes-of-interest.html"><a href="plot-genes-of-interest.html"><i class="fa fa-check"></i><b>12</b> Plot genes of interest</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Gene expression analysis using the DE4Rumi package</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="importing-data" class="section level1" number="3">
+<h1><span class="header-section-number">Chapter 3</span> Importing Data</h1>
+<p><strong>DE4Rumi</strong> takes 2 files as input:</p>
+<ol style="list-style-type: decimal">
+<li>Counts matrix/table</li>
+<li>A table with metadata for each sample</li>
+</ol>
+<div id="note-on-importing-files" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Note on importing files</h2>
+<p>There are many functions used to import data into R, but it is suggested that
+the <code>fread</code> function from the <strong>data.table</strong> packages is used <span class="citation">(<a href="#ref-R-data.table" role="doc-biblioref">Dowle and Srinivasan 2021</a>)</span>.
+Not only is it much faster than alternatives, it also automatically detects file
+types and column separators (e.g. tab or comma) for most files. If you do not
+use <strong>data.table</strong> much, then you might not want to load it into your session and
+instead just name the package each time you use <code>fread</code> by
+typing <code>data.table::fread(file = "./testfile.csv")</code>.</p>
+</div>
+<div id="import-count-data" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Import count data</h2>
+<p>Count data refers to data generated by Next Generation Sequencing technologies,
+such as RNAseq, and represents how abundant a gene’s mRNA was in the sample.
+These count tables are produced from processing .fastq files with an RNAseq pipeline, which is not discussed here.
+For example, the data used in this example was generated with a bioinformatics workflow
+consisting of FastQC -&gt; trimmomatic -&gt; STAR Aligner -&gt; featureCounts on htt://usegalaxy.org.au.
+Visit <a href="https://davos-i.github.io/Galaxy_RNASeq_Book/" class="uri">https://davos-i.github.io/Galaxy_RNASeq_Book/</a> for more details.</p>
+<p>The counts matrix/table must be imported with the first column titled
+<code>gene_ensembl</code> and all other columns named as the respective individual samples.<br />
+Each row contains the counts for each gene across all samples, and the first
+column must contain Ensembl ID’s e.g. <code>ENSBTAG00000000005</code>.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="importing-data.html#cb24-1" aria-hidden="true" tabindex="-1"></a>cts_all <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">fread</span>( <span class="at">file =</span> <span class="st">&quot;./Inputs/counts_matrix_bstCattle.txt&quot;</span>)</span>
+<span id="cb24-2"><a href="importing-data.html#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#view first 10 rows of first 5 columns</span></span>
+<span id="cb24-3"><a href="importing-data.html#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cts_all[,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>])</span></code></pre></div>
+<pre><code>##          gene_ensembl VMH_15 VMH_13 VMH_12 VMH_11
+## 1: ENSBTAG00000000005   1260    705    776    561
+## 2: ENSBTAG00000000008      2      0      0      0
+## 3: ENSBTAG00000000009     83     51     81     71
+## 4: ENSBTAG00000000010   1084    619    674    462
+## 5: ENSBTAG00000000011    230    179    237    170
+## 6: ENSBTAG00000000012    380    287    293    227</code></pre>
+<div id="check-structure-of-data" class="section level3" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Check structure of data</h3>
+<p>It’s often a good idea to check the structure of a table after it is imported, particularly to check that
+columns are of the correct type/class. E.g. are numbers treated as numbers (int) or are they characters (chr) that need converting?
+Fortunately <code>data.table::fread</code> guesses these correctly most of the time.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="importing-data.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#showing first 15 columns to save space</span></span>
+<span id="cb26-2"><a href="importing-data.html#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(cts_all[,<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>])</span></code></pre></div>
+<pre><code>## Classes &#39;data.table&#39; and &#39;data.frame&#39;:   27607 obs. of  15 variables:
+##  $ gene_ensembl: chr  &quot;ENSBTAG00000000005&quot; &quot;ENSBTAG00000000008&quot; &quot;ENSBTAG00000000009&quot; &quot;ENSBTAG00000000010&quot; ...
+##  $ VMH_15      : int  1260 2 83 1084 230 380 1124 1507 593 10 ...
+##  $ VMH_13      : int  705 0 51 619 179 287 962 1050 200 12 ...
+##  $ VMH_12      : int  776 0 81 674 237 293 1050 1249 377 5 ...
+##  $ VMH_11      : int  561 0 71 462 170 227 712 856 206 10 ...
+##  $ VMH_10      : int  977 0 53 733 221 317 853 1028 419 3 ...
+##  $ VMH_09      : int  803 3 48 623 198 314 939 1049 381 17 ...
+##  $ VMH_08      : int  847 0 45 519 227 243 815 937 273 5 ...
+##  $ VMH_07      : int  893 2 50 695 186 243 718 1164 433 12 ...
+##  $ VMH_06      : int  793 3 76 563 167 267 838 859 286 9 ...
+##  $ VMH_05      : int  703 2 54 720 207 183 613 1189 425 9 ...
+##  $ VMH_04      : int  529 1 51 445 142 190 721 704 180 4 ...
+##  $ VMH_03      : int  669 3 55 550 154 225 567 893 330 3 ...
+##  $ VMH_02      : int  614 0 50 508 170 244 726 839 321 4 ...
+##  $ VMH_01      : int  693 3 29 613 154 246 607 910 471 4 ...
+##  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt;</code></pre>
+</div>
+</div>
+<div id="import-column-metadata" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Import column metadata</h2>
+<p><strong>DE4Rumi</strong> automates many processes that would otherwise require manual input to set names of treatments and pairwise comparisons, etc.
+To do this, it relies on the sample names being in a specific format:</p>
+<p><code>Tissue_Region_ID__Treatment</code> or in R: <code>paste0(Tissue_Region, "_", ID, "__", Treatment)</code></p>
+<p><em>Note that there are two underscores between ID and Treatment</em></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="importing-data.html#cb28-1" aria-hidden="true" tabindex="-1"></a>coldata <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">fread</span>(<span class="st">&quot;./Inputs/colData_all_regions.csv&quot;</span>) </span>
+<span id="cb28-2"><a href="importing-data.html#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="importing-data.html#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Turn animal ID&#39;s into characters (not integers), with leading 0&#39;s and then </span></span>
+<span id="cb28-4"><a href="importing-data.html#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#make sample_names column</span></span>
+<span id="cb28-5"><a href="importing-data.html#cb28-5" aria-hidden="true" tabindex="-1"></a>coldata <span class="ot">&lt;-</span> </span>
+<span id="cb28-6"><a href="importing-data.html#cb28-6" aria-hidden="true" tabindex="-1"></a>  coldata <span class="sc">%&gt;%</span> </span>
+<span id="cb28-7"><a href="importing-data.html#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ID =</span> <span class="fu">as.character</span>(ID) <span class="sc">%&gt;%</span> stringr<span class="sc">::</span><span class="fu">str_pad</span>(<span class="dv">3</span>, <span class="at">pad =</span> <span class="st">&quot;0&quot;</span>),</span>
+<span id="cb28-8"><a href="importing-data.html#cb28-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">sample_names =</span> <span class="fu">paste0</span>(Tissue_Region, <span class="st">&quot;_&quot;</span>, ID, <span class="st">&quot;__&quot;</span>, Treatment))</span>
+<span id="cb28-9"><a href="importing-data.html#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="importing-data.html#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(coldata)</span></code></pre></div>
+<pre><code>##      Name Treatment Tissue_Region  ID sample_names
+## 1: ARC_01        LR           ARC 004  ARC_004__LR
+## 2: ARC_02       MAL           ARC 008 ARC_008__MAL
+## 3: ARC_03        LR           ARC 022  ARC_022__LR
+## 4: ARC_04        LR           ARC 032  ARC_032__LR
+## 5: ARC_05       LAL           ARC 052 ARC_052__LAL
+## 6: ARC_06       MAL           ARC 066 ARC_066__MAL</code></pre>
+</div>
+<div id="rename-columns-to-match-required-format" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Rename columns to match required format</h2>
+<p>Each set of data will be different, and it is unlikely that the column names of the counts table match the required format for use in this package.
+Therefore, there users will normally have to rename these columns. Below is a quick way to do it.</p>
+<p>You will notice that some names don’t look correct. This will be explained further in next step.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="importing-data.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new names for cts columns</span></span>
+<span id="cb30-2"><a href="importing-data.html#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="do">## This step will normally require customisation for each new dataset</span></span>
+<span id="cb30-3"><a href="importing-data.html#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="do">## This step is important to make sure the new names are in teh same order as the old names.</span></span>
+<span id="cb30-4"><a href="importing-data.html#cb30-4" aria-hidden="true" tabindex="-1"></a>temp_colnames_calc <span class="ot">&lt;-</span> </span>
+<span id="cb30-5"><a href="importing-data.html#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(cts_all)[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">%&gt;%</span> <span class="co">#Take the column names minus the first one</span></span>
+<span id="cb30-6"><a href="importing-data.html#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> <span class="co">#convert it to a tibble</span></span>
+<span id="cb30-7"><a href="importing-data.html#cb30-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">Name =</span> value) <span class="sc">%&gt;%</span> <span class="co">#rename the &#39;value&#39; column which is generated in previous step to be &#39;Name&#39;</span></span>
+<span id="cb30-8"><a href="importing-data.html#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(coldata, <span class="at">by =</span> <span class="st">&quot;Name&quot;</span>) <span class="co">#add the coldata table to it, by matching on the columns &quot;Name&quot;</span></span>
+<span id="cb30-9"><a href="importing-data.html#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-10"><a href="importing-data.html#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="importing-data.html#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="co"># add new column names</span></span>
+<span id="cb30-12"><a href="importing-data.html#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Take the column named &#39;sample_names&quot; and add them as the new column names of the counts table, starting after the first column</span></span>
+<span id="cb30-13"><a href="importing-data.html#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(cts_all)[<span class="sc">-</span><span class="dv">1</span>] <span class="ot">&lt;-</span> temp_colnames_calc[[<span class="st">&quot;sample_names&quot;</span>]]</span>
+<span id="cb30-14"><a href="importing-data.html#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Name the first column &#39;gene_ensembl&#39;, as required.</span></span>
+<span id="cb30-15"><a href="importing-data.html#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(cts_all)[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">&quot;gene_ensembl&quot;</span></span>
+<span id="cb30-16"><a href="importing-data.html#cb30-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-17"><a href="importing-data.html#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Check column names of counts table</span></span>
+<span id="cb30-18"><a href="importing-data.html#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(cts_all)</span></code></pre></div>
+<pre><code>##   [1] &quot;gene_ensembl&quot; &quot;VMH_193__LAL&quot; &quot;VMH_184__LAL&quot; &quot;VMH_149__LR&quot;  &quot;VMH_136__LAL&quot;
+##   [6] &quot;VMH_112__LAL&quot; &quot;VMH_096__MAL&quot; &quot;VMH_088__MAL&quot; &quot;VMH_079__LR&quot;  &quot;VMH_066__MAL&quot;
+##  [11] &quot;VMH_052__LAL&quot; &quot;VMH_032__LR&quot;  &quot;VMH_022__LR&quot;  &quot;VMH_008__MAL&quot; &quot;VMH_004__LR&quot; 
+##  [16] &quot;LHA_193__LAL&quot; &quot;LHA_186__MAL&quot; &quot;LHA_184__LAL&quot; &quot;LHA_149__LR&quot;  &quot;LHA_136__LAL&quot;
+##  [21] &quot;LHA_112__LAL&quot; &quot;LHA_096__MAL&quot; &quot;LHA_088__MAL&quot; &quot;LHA_079__LR&quot;  &quot;LHA_066__MAL&quot;
+##  [26] &quot;LHA_052__LAL&quot; &quot;LHA_032__LR&quot;  &quot;LHA_022__LR&quot;  &quot;LHA_008__MAL&quot; &quot;LHA_004__LR&quot; 
+##  [31] &quot;ARC_193__LAL&quot; &quot;ARC_186__MAL&quot; &quot;ARC_184__LAL&quot; &quot;ARC_149__LR&quot;  &quot;ARC_136__LAL&quot;
+##  [36] &quot;ARC_112__LAL&quot; &quot;ARC_096__MAL&quot; &quot;ARC_088__MAL&quot; &quot;ARC_079__LR&quot;  &quot;ARC_066__MAL&quot;
+##  [41] &quot;ARC_052__LAL&quot; &quot;ARC_032__LR&quot;  &quot;ARC_022__LR&quot;  &quot;ARC_008__MAL&quot; &quot;ARC_004__LR&quot; 
+##  [46] &quot;VMH_186__MAL&quot; &quot;RUM_066__MAL&quot; &quot;ABO_052__LAL&quot; &quot;DUO_079__LR&quot;  &quot;DUO_186__MAL&quot;
+##  [51] &quot;ABO_149__LR&quot;  &quot;ABO_186__MAL&quot; &quot;RUM_112__LAL&quot; &quot;DUO_149__LR&quot;  &quot;DUO_004__LR&quot; 
+##  [56] &quot;ABO_088__MAL&quot; &quot;ABO_022__LR&quot;  &quot;DUO_066__MAL&quot; &quot;RUM_079__LR&quot;  &quot;ABO_032__LR&quot; 
+##  [61] &quot;ABO_184__LAL&quot; &quot;DUO_193__LAL&quot; &quot;RUM_136__LAL&quot; &quot;DUO_184__LAL&quot; &quot;ABO_193__LAL&quot;
+##  [66] &quot;RUM_004__LR&quot;  &quot;ABO_008__MAL&quot; &quot;ABO_096__MAL&quot; &quot;ABO_112__LAL&quot; &quot;RUM_186__MAL&quot;
+##  [71] &quot;DUO_052__LAL&quot; &quot;ABO_079__LR&quot;  &quot;RUM_032__LR&quot;  &quot;DUO_088__MAL&quot; &quot;ABO_004__LR&quot; 
+##  [76] &quot;RUM_008__MAL&quot; &quot;RUM_096__MAL&quot; &quot;DUO_022__LR&quot;  &quot;DUO_112__LAL&quot; &quot;RUM_149__LR&quot; 
+##  [81] &quot;RUM_193__LAL&quot; &quot;ABO_136__LAL&quot; &quot;ABO_066__MAL&quot; &quot;RUM_052__LAL&quot; &quot;DUO_032__LR&quot; 
+##  [86] &quot;RUM_088__MAL&quot; &quot;DUO_008__MAL&quot; &quot;DUO_096__MAL&quot; &quot;RUM_022__LR&quot;  &quot;DUO_136__LAL&quot;
+##  [91] &quot;RUM_184__LAL&quot; &quot;LIV_30&quot;       &quot;LIV_193__LAL&quot; &quot;LIV_186__MAL&quot; &quot;LIV_184__LAL&quot;
+##  [96] &quot;LIV_149__LR&quot;  &quot;LIV_25&quot;       &quot;LIV_24&quot;       &quot;LIV_136__LAL&quot; &quot;LIV_22&quot;      
+## [101] &quot;LIV_112__LAL&quot; &quot;LIV_20&quot;       &quot;LIV_19&quot;       &quot;LIV_18&quot;       &quot;LIV_096__MAL&quot;
+## [106] &quot;LIV_088__MAL&quot; &quot;LIV_079__LR&quot;  &quot;LIV_066__MAL&quot; &quot;LIV_13&quot;       &quot;LIV_052__LAL&quot;
+## [111] &quot;LIV_11&quot;       &quot;LIV_10&quot;       &quot;LIV_032__LR&quot;  &quot;LIV_08&quot;       &quot;LIV_022__LR&quot; 
+## [116] &quot;LIV_06&quot;       &quot;LIV_05&quot;       &quot;LIV_04&quot;       &quot;LIV_03&quot;       &quot;LIV_008__MAL&quot;
+## [121] &quot;LIV_004__LR&quot;</code></pre>
+</div>
+<div id="check-data" class="section level2" number="3.5">
+<h2><span class="header-section-number">3.5</span> Check data</h2>
+<p>The <strong>DE4Rumi</strong> package includes some helper functions to ensure that the column data and the counts matrix are formatted correctly.</p>
+<p>In the previous step, there were some unusual looking names. This is because there is coldata information for samples that were not included in this analysis. This might be common if you have sequenced a subset of samples from a larger experiment. This is not a problem, and the following functions will handle it appropriately.</p>
+<p>The first check we run is the <code>check_count_matrix()</code> function. It takes the counts data, the column data and the name of the column in the column data that contains the sample names (to match to the counts data). If there is an error, it will tell you more details in the Console of R Studio (at bottom of screen).</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="importing-data.html#cb32-1" aria-hidden="true" tabindex="-1"></a>cts_filtered <span class="ot">&lt;-</span> </span>
+<span id="cb32-2"><a href="importing-data.html#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_count_matrix</span>(<span class="at">count_data =</span> cts_all,</span>
+<span id="cb32-3"><a href="importing-data.html#cb32-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">colData =</span> coldata,</span>
+<span id="cb32-4"><a href="importing-data.html#cb32-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">column_with_col_names =</span> sample_names)</span></code></pre></div>
+<p>In this case there was some checks that did not pass, but there was also an error which terminated the function. The critical error here was:</p>
+<pre><code>## FAIL: colData has entries in column_with_col_names that do not match a column in count_data. Potentially missing data?
+## Entries in colData with no matching counts data: LIV_999__NO
+##  Error in check_count_matrix(count_data = cts_all, colData = coldata, column_with_col_names = sample_names) : 
+##   Checks terminated. See notes in Console. Run subset_colData() and try again.</code></pre>
+<p>In the console it listed the <code>Entries in colData with no matching counts data: LIV_999__NO</code> which means that there is an extra sample in the counts data. Users may wish to address this manually by re-importing a correct coldata file. Otherwise, the <strong>DE4Rumi</strong> also contains the function <code>subset_colData()</code> which can automatically remove the entry. Notice that the function outputs the new coldata, and we have assigned it to the same name: <code>coldata</code>.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="importing-data.html#cb34-1" aria-hidden="true" tabindex="-1"></a>coldata <span class="ot">&lt;-</span> <span class="fu">subset_colData</span>(<span class="at">count_data =</span> cts_all,</span>
+<span id="cb34-2"><a href="importing-data.html#cb34-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colData =</span> coldata,</span>
+<span id="cb34-3"><a href="importing-data.html#cb34-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">column_with_col_names =</span> sample_names)</span>
+<span id="cb34-4"><a href="importing-data.html#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Entries in colData with no matching counts data: LIV_999__NO</span></span>
+<span id="cb34-5"><a href="importing-data.html#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Dimensions before filtering:  106   5</span></span>
+<span id="cb34-6"><a href="importing-data.html#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Dimensions after filtering:  105   5</span></span></code></pre></div>
+<p>The output above shows that the missing sample has been removed. Next, we re-run the <code>check_count_matrix()</code> function. See that it also shows the extra coldata entries that we noticed above. Also notice that this function outputs a <code>cts-filtered</code> object which has been filtered, meaning it is ready to use downstream.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="importing-data.html#cb35-1" aria-hidden="true" tabindex="-1"></a>cts_filtered <span class="ot">&lt;-</span> </span>
+<span id="cb35-2"><a href="importing-data.html#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">check_count_matrix</span>(<span class="at">count_data =</span> cts_all,</span>
+<span id="cb35-3"><a href="importing-data.html#cb35-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">colData =</span> coldata,</span>
+<span id="cb35-4"><a href="importing-data.html#cb35-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">column_with_col_names =</span> sample_names)</span>
+<span id="cb35-5"><a href="importing-data.html#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="do">## FAIL: Not all columns in count_data have matching data in colData</span></span>
+<span id="cb35-6"><a href="importing-data.html#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Missing samples:</span></span>
+<span id="cb35-7"><a href="importing-data.html#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] &quot;LIV_30&quot; &quot;LIV_25&quot; &quot;LIV_24&quot; &quot;LIV_22&quot; &quot;LIV_20&quot; &quot;LIV_19&quot; &quot;LIV_18&quot; &quot;LIV_13&quot;</span></span>
+<span id="cb35-8"><a href="importing-data.html#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="do">##  [9] &quot;LIV_11&quot; &quot;LIV_10&quot; &quot;LIV_08&quot; &quot;LIV_06&quot; &quot;LIV_05&quot; &quot;LIV_04&quot; &quot;LIV_03&quot;</span></span>
+<span id="cb35-9"><a href="importing-data.html#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Function will now output count_data without these columns!!</span></span>
+<span id="cb35-10"><a href="importing-data.html#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="do">## PASS: Rownames not detected</span></span>
+<span id="cb35-11"><a href="importing-data.html#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="do">## PASS: First column name is &#39;gene_ensembl&#39;</span></span>
+<span id="cb35-12"><a href="importing-data.html#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb35-13"><a href="importing-data.html#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="do">##  Dimensions of raw counts dataset BEFORE sorting:</span></span>
+<span id="cb35-14"><a href="importing-data.html#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="do">## genes:  27607     samples:  120</span></span>
+<span id="cb35-15"><a href="importing-data.html#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb35-16"><a href="importing-data.html#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="do">##  Number of samples in colData: 105</span></span>
+<span id="cb35-17"><a href="importing-data.html#cb35-17" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb35-18"><a href="importing-data.html#cb35-18" aria-hidden="true" tabindex="-1"></a><span class="do">##  Dimensions of raw counts dataset AFTER sorting:</span></span>
+<span id="cb35-19"><a href="importing-data.html#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="do">## genes:  27607     samples:  105</span></span></code></pre></div>
+
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-R-data.table" class="csl-entry">
+Dowle, Matt, and Arun Srinivasan. 2021. <em>Data.table: Extension of ‘Data.frame‘</em>. <a href="https://CRAN.R-project.org/package=data.table">https://CRAN.R-project.org/package=data.table</a>.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="project-set-up.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="prepare-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/03-Import_data.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
